@@ -57,7 +57,6 @@ def generatePFLines(img, offX, offY, algo):
             line = ""
             for x in range(img.size[0]):
                 rgb = img.getpixel((x, y))
-                rgb = swapRGB(rgb, 0, 2)
                 if hasAlpha:
                     hexColor = '%02x%02x%02x%02x' % rgb
                 else:
@@ -80,7 +79,6 @@ def generatePFLines(img, offX, offY, algo):
                 x = coordinates[index][0]
                 y = coordinates[index][1]
                 rgb = img.getpixel(coordinates[index])
-                rgb = swapRGB(rgb, 0, 2)
                 if hasAlpha:
                     hexColor = '%02x%02x%02x%02x' % rgb
                 else:
