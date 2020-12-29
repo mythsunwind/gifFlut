@@ -95,6 +95,7 @@ def getConvertedImage(imgPath, xoff=0, yoff=0, compr=True, regen=False, noCache=
 
 
 def sendData(part=0, numParts=1):
+    global lastFrame
     frameLen = len(frameBuffer[curFrame])
     partLen = int(frameLen / numParts)
     partStart = part * partLen
@@ -102,15 +103,17 @@ def sendData(part=0, numParts=1):
     if part == numParts - 1: ##last frame must be handled extra
         partEnd += 1
     while(running):
-        for lineNum in range(partStart, partStart + partLen):
-            if running:
-                try:
-                    sock[part].sendall(frameBuffer[curFrame]
+        if curFrame != lastFrame:
+            lastFrame = curFrame
+            for lineNum in range(partStart, partStart + partLen):
+                if running:
+                    try:
+                        sock[part].sendall(frameBuffer[curFrame]
                                  [lineNum].encode("ascii"))
-                except (ConnectionResetError, ConnectionAbortedError, OSError, NameError, IndexError, TimeoutError):
-                    time.sleep(0.1)
-                    connect(part)
-
+                        print("sent line " + str(lineNum) + " of frame " + str(curFrame))
+                    except (ConnectionResetError, ConnectionAbortedError, OSError, NameError, IndexError, TimeoutError):
+                        time.sleep(0.1)
+                        connect(part)
 
 def connect(socketId=0):
     global sock, lastTimeCalled, currentlyConnecting
@@ -168,13 +171,14 @@ def main():
     sock = []
     currentlyConnecting = False
 
-    global frameBuffer, running, curFrame
+    global frameBuffer, running, curFrame, lastFrame
     data = getConvertedImage(args.imageFile, args.xoffset, args.yoffset,
                              not args.nocompression, args.regenerate, args.nocache, args.algorithm)
     frameBuffer = data['frameBuffer']
     frameTime = data['duration']
     running = True
     curFrame = 0
+    lastFrame = -1
 
     threads = []
     for t in range(args.threads):
