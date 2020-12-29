@@ -171,6 +171,9 @@ def main():
     sock = []
     currentlyConnecting = False
 
+    # create cache directy if needed
+    os.makedirs("rendered", exist_ok=True)
+
     global frameBuffer, running, curFrame, lastFrame
     data = getConvertedImage(args.imageFile, args.xoffset, args.yoffset,
                              not args.nocompression, args.regenerate, args.nocache, args.algorithm)
